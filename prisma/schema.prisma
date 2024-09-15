@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model user {
+  id       Int       @id @default(autoincrement())
+  name     String
+  email    String    @unique
+  password String
+  role Role @default(USER)
+  post     post[]
+  media    String    @default("https://kit8.net/wp-content/uploads/edd/2021/10/user_preview.jpg")
+  comment  comment[]
+  Like     Like[]
+}
+
+model post {
+  id        Int    @id @default(autoincrement())
+  PostBody  String
+  PostTitle String
+  userId    Int // foreign key field
+  user      user   @relation(fields: [userId], references: [id])
+
+  comment comment[]
+  Like    Like[]
+}
+
+model comment {
+  id           Int    @id @default(autoincrement())
+  commentBody  String
+  commentTitle String
+  userId       Int // foreign key field
+  user         user   @relation(fields: [userId], references: [id])
+  postId       Int // foreign key field
+  post         post   @relation(fields: [postId], references: [id])
+}
+
+model Like {
+  id     Int  @id @default(autoincrement())
+  userId Int // foreign key field
+  user   user @relation(fields: [userId], references: [id])
+  postId Int // foreign key field
+  post   post @relation(fields: [postId], references: [id])
+}
